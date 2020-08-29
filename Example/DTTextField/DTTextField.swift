@@ -16,12 +16,13 @@ public extension String {
     }
 }
 
-public class DTTextField: UITextField {
+public class DTTextField: UITextField, UITextFieldDelegate {
     
     public enum FloatingDisplayStatus{
         case always
         case never
         case defaults
+        case onEditing
     }
     
     public enum DTBorderStyle{
@@ -41,6 +42,7 @@ public class DTTextField: UITextField {
     
     fileprivate let paddingHeight:CGFloat                   = 10.0
     fileprivate var borderLayer:CALayer                     = CALayer()
+    fileprivate var textFieldDidBeginEditing:Bool           = false
     public var dtLayer:CALayer                              = CALayer()
     public var floatPlaceholderColor:UIColor                = UIColor.black
     public var floatPlaceholderActiveColor:UIColor          = UIColor.black
@@ -252,6 +254,7 @@ public class DTTextField: UITextField {
 
     fileprivate func commonInit() {
         
+        delegate                    = self
         dtborderStyle               = .rounded
         dtLayer.backgroundColor     = UIColor.white.cgColor
         
@@ -504,6 +507,10 @@ public class DTTextField: UITextField {
             hideFlotingLabel(isFirstResponder)
         case .always:
             showFloatingLabel(isFirstResponder)
+        case .onEditing:
+            if textFieldDidBeginEditing {
+                showFloatingLabel(isFirstResponder)
+            }
         default:
             if let enteredText = text,!enteredText.isEmptyStr{
                 showFloatingLabel(isFirstResponder)
@@ -511,6 +518,13 @@ public class DTTextField: UITextField {
                 hideFlotingLabel(isFirstResponder)
             }
         }
+    }
+    
+    public func textFieldDidBeginEditing(_ textField: UITextField) {
+        textFieldDidBeginEditing = true
+    }
+    public func textFieldDidEndEditing(_ textField: UITextField) {
+        textFieldDidBeginEditing = false
     }
 
 }
